@@ -1,26 +1,29 @@
 import tkinter
 import time
 import string
+from multiprocessing import Process, Queue
+import queue
 
 
-if __name__ == '__main__':
-    #Global Variables
+
+def start_GUI(message_queue):
+    """This function starts the GUI."""
+    # Global Variables
     i=0
     pod_status = {0: 'Fault', 1: 'Safe to Approach', 2: 'Ready to Launch', 3: 'Launching',
                   4: 'Coasting', 5: 'Braking', 6: 'Crawling'}
 
-
     main_window = tkinter.Tk()
     main_window.title('Cooper Union HyperLoop Monitor')
 
-    #GUI Set-up
+    # GUI Set-up
     main_window.geometry('550x250')
 
     tkinter.Label(main_window, text='Summary', font='Helvetica 10 bold').grid(row=0, column=0, columnspan=3)
     tkinter.Label(main_window, text='Pod Status').grid(row=1, sticky='w')
     tkinter.Label(main_window, text='Velocity').grid(row=2, sticky='w')
     tkinter.Label(main_window, text='cm/s').grid(row=2, column=2, sticky='w')
-    tkinter.Label(main_window, text='Acceleration(X)').grid(row=3, sticky='w')
+    tkinter.Label(main_window, text='Acceleration(Y)').grid(row=3, sticky='w')
     tkinter.Label(main_window, text='cm/s'+'\u00B2').grid(row=3, column=2, sticky='w')
     tkinter.Label(main_window, text='Position').grid(row=4, sticky='w')
     tkinter.Label(main_window, text='cm').grid(row=4, column=2, sticky='w')
@@ -87,19 +90,30 @@ if __name__ == '__main__':
     z_acceleration.set('')
 
     def update_data():
-        test_status = 1 # This will be replaced by received message later...
+        """test_status = 1 # This will be replaced by received message later...
         global i
         x_acceleration.set(str(i))
         if test_status in pod_status:
             status.set(pod_status[test_status])
         else:
             status.set('N/A')
-        i = i + 1
-
-
+        i = i + 1"""
+        try:
+            message = message_queue.get(timeout=0.1)
+        except queue.Empty:
+            message = ''
+        if message:
+            print(message)
+            status.set(pod_status[int(message[1])])
+            position.set(str(int.from_bytes(message[2:6], byteorder='big', signed=True)))
+            velocity.set(str(int.from_bytes(message[6:10], byteorder='big', signed=True)))
+            acceleration.set(str(int.from_bytes(message[10:14], byteorder='big', signed=True)))
+            battery_voltage.set(str(int.from_bytes(message[14:18], byteorder='big', signed=True)))
+            battery_current.set(str(int.from_bytes(message[18:22], byteorder='big', signed=True)))
+            battery_temperature.set(str(int.from_bytes(message[22:26], byteorder='big', signed=True)))
+            pod_temperature.set(str(int.from_bytes(message[26:30], byteorder='big', signed=True)))
         main_window.after(2000, update_data)
         return update_data
     update_data()
     main_window.mainloop()
-
 
