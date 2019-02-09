@@ -5,7 +5,6 @@ from multiprocessing import Process, Queue
 import queue
 
 
-
 def start_GUI(message_queue):
     """This function starts the GUI."""
     # Global Variables
@@ -17,7 +16,7 @@ def start_GUI(message_queue):
     main_window.title('Cooper Union HyperLoop Monitor')
 
     # GUI Set-up
-    main_window.geometry('550x250')
+    main_window.geometry('580x400')
 
     tkinter.Label(main_window, text='Summary', font='Helvetica 10 bold').grid(row=0, column=0, columnspan=3)
     tkinter.Label(main_window, text='Pod Status').grid(row=1, sticky='w')
@@ -43,6 +42,7 @@ def start_GUI(message_queue):
     tkinter.Label(main_window, text='cm/s'+'\u00B2').grid(row=8, column=5, sticky='w')
     tkinter.Label(main_window, text='Z-Acceleration').grid(row=9, column=3)
     tkinter.Label(main_window, text='cm/s'+'\u00B2').grid(row=9, column=5, sticky='w')
+    tkinter.Label(main_window, text='Control Panel', font='Helvetica 10 bold').grid(row=10, column=0, columnspan=6)
 
     status = tkinter.StringVar()
     velocity = tkinter.StringVar()
@@ -55,6 +55,8 @@ def start_GUI(message_queue):
     x_acceleration = tkinter.StringVar()
     y_acceleration = tkinter.StringVar()
     z_acceleration = tkinter.StringVar()
+    crawl_distance = tkinter.StringVar()
+    crawl_direction = tkinter.StringVar()
 
     status_field = tkinter.Entry(main_window, textvariable=status)
     velocity_field = tkinter.Entry(main_window, textvariable=velocity)
@@ -67,6 +69,8 @@ def start_GUI(message_queue):
     x_acceleration_field = tkinter.Entry(main_window, textvariable=x_acceleration)
     y_acceleration_field = tkinter.Entry(main_window, textvariable=y_acceleration)
     z_acceleration_field = tkinter.Entry(main_window, textvariable=z_acceleration)
+    crawl_direction_field = tkinter.Entry(main_window, textvariable=crawl_direction)
+    crawl_distance_field = tkinter.Entry(main_window, textvariable=crawl_distance)
 
     status_field.grid(row=1, column=1)
     velocity_field.grid(row=2, column=1)
@@ -79,6 +83,8 @@ def start_GUI(message_queue):
     x_acceleration_field.grid(row=7, column=4)
     y_acceleration_field.grid(row=8, column=4)
     z_acceleration_field.grid(row=9, column=4)
+    crawl_distance_field.grid(row=17, column=3)
+    crawl_direction_field.grid(row=17, column=4)
 
     status.set('')
     velocity.set('')
@@ -88,6 +94,28 @@ def start_GUI(message_queue):
     x_acceleration.set('')
     y_acceleration.set('')
     z_acceleration.set('')
+    crawl_direction.set('')
+    crawl_distance.set('')
+
+    button_prime_run = tkinter.Button(text="PRIME_RUN", width=20)
+    button_stop = tkinter.Button(text="STOP", width=20)
+    button_e_stop = tkinter.Button(text="E_STOP", width=20)
+    button_dump_debug = tkinter.Button(text="DUMP_DEBUG", width=20)
+    button_make_safe = tkinter.Button(text="MAKE_SAFE", width=20)
+    button_zero_reading = tkinter.Button(text="ZERO_READING", width=20)
+    button_accelerate = tkinter.Button(text="ACCELERATE", width=20)
+    button_crawl = tkinter.Button(text="CRAWL", width=20)
+
+    button_prime_run.grid(row=12, column=0, columnspan=3)
+    button_stop.grid(row=12, column=3, columnspan=3)
+    button_e_stop.grid(row=13, column=0, columnspan=3)
+    button_dump_debug.grid(row=13, column=3, columnspan=3)
+    button_make_safe.grid(row=14, column=0, columnspan=3)
+    button_zero_reading.grid(row=14, column=3, columnspan=3)
+    button_accelerate.grid(row=15, column=0, columnspan=3)
+    button_crawl.grid(row=16, column=0, columnspan=3)
+    tkinter.Label(main_window, text='Distance (cm)').grid(row=16, column=3, sticky='w')
+    tkinter.Label(main_window, text='Direction (F/R)').grid(row=16, column=4, sticky='w')
 
     def update_data():
         """test_status = 1 # This will be replaced by received message later...
